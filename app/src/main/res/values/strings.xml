@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="orderby_array">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
+
+</resources>
