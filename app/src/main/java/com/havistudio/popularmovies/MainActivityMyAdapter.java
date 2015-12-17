@@ -1,5 +1,6 @@
 package com.havistudio.popularmovies;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,67 +9,80 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by kostas on 16/12/2015.
  */
-public class MainActivityMyAdapter {
+public class MainActivityMyAdapter extends BaseAdapter {
 
-    public class ImageAdapter extends BaseAdapter {
-        private Context context;
-        private final String[] mobileValues;
+    private Context context;
+    private List<Movie> data = null;
+    private int layoutResourceId;
 
-        public ImageAdapter(Context context, String[] mobileValues) {
-            this.context = context;
-            this.mobileValues = mobileValues;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View gridView;
-
-            if (convertView == null) {
-
-                gridView = new View(context);
-
-                // get layout from mobile.xml
-                gridView = inflater.inflate(R.layout.gridview_layout_main, null);
-
-                // set value into textview
-                TextView textView = (TextView) gridView
-                        .findViewById(R.id.grid_item_label);
-                textView.setText(mobileValues[position]);
-
-                // set image based on selected text
-                ImageView imageView = (ImageView) gridView
-                        .findViewById(R.id.grid_item_image);
-
-                String mobile = mobileValues[position];
-
-            } else {
-                gridView = (View) convertView;
-            }
-
-            return gridView;
-        }
-
-        @Override
-        public int getCount() {
-            return mobileValues.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
+    public MainActivityMyAdapter(Context context, List<Movie> data, int layoutResourceId) {
+        this.context = context;
+        this.data = data;
+        this.layoutResourceId = layoutResourceId;
     }
 
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        View row = convertView;
+        MovieHolder holder = null;
+
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            row = inflater.inflate(layoutResourceId, parent, false);
+
+            holder = new MovieHolder();
+            holder.imgIcon = (ImageView) row.findViewById(R.id.grid_item_image);
+            holder.txtTitle = (TextView) row.findViewById(R.id.grid_item_label);
+
+            row.setTag(holder);
+        } else {
+            holder = (MovieHolder) row.getTag();
+        }
+
+        Movie movie = data.get(position);
+        holder.txtTitle.setText(movie.getTitle());
+        Picasso.with(context).load(movie.getImage()).into(holder.imgIcon);
+
+        return row;
+    }
+
+    static class MovieHolder {
+        ImageView imgIcon;
+        TextView txtTitle;
+    }
+
+    @Override
+    public int getCount() {
+        return data.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return data.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    public void updateResults(List<Movie> results) {
+        data = results;
+        //Triggers the list update
+        notifyDataSetChanged();
+    }
+
+    public void removeAll(){
+        for(int i=0; i<data.size(); i++){
+            data.remove(i);
+        }
+    }
 }
