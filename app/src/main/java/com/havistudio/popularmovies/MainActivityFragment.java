@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class MainActivityFragment extends Fragment {
 
-    private static final String API_KEY = "b3b5d8d597d63f6052374d1647d200b6";
+    private static final String API_KEY = "YOUR_API_KEY";
     private MainActivityMyAdapter mMovieAdapter;
     private Context mContext;
     private Spinner spinner;
