@@ -10,7 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,14 +31,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
-    private static final String API_KEY = "YOUR_API_KEY";
     private MainActivityMyAdapter mMovieAdapter;
     private Context mContext;
+
+    private GridView mGridView;
+
+    @Bind(R.id.order_movies)
     private Spinner spinner;
 
     public MainActivityFragment() {
@@ -53,8 +62,9 @@ public class MainActivityFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        spinnerValue((String) spinner.getSelectedItem());
+        mGridView = (GridView) rootView.findViewById(R.id.gridView_movies);
 
+        ButterKnife.bind(this, rootView);
         return rootView;
     }
 
@@ -69,19 +79,14 @@ public class MainActivityFragment extends Fragment {
         mMovieAdapter = new MainActivityMyAdapter(getActivity(), spotifyArtist, R.layout.gridview_layout_main);
 
         MovieDBAPITask sat = new MovieDBAPITask();
-        sat.execute();
+        sat.execute(spinnerValue((String) spinner.getSelectedItem()));
 
-        lv.setAdapter(mSpotifyArtistAdapter);
+        mGridView.setAdapter(mMovieAdapter);
     }
 
     public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
 
         private final String LOG_TAG = MovieDBAPITask.class.getSimpleName();
-        private String spinnerSorter;
-
-        public MovieDBAPITask(String spinnerSorter){
-
-        }
 
         @Override
         protected List<Movie> doInBackground(String... params) {
@@ -107,8 +112,8 @@ public class MainActivityFragment extends Fragment {
                         .appendPath("3")
                         .appendPath("discover")
                         .appendPath("movie")
-                        .appendQueryParameter("api_key", API_KEY)
-                        .appendQueryParameter("sort_by", spinnerSorter);
+                        .appendQueryParameter("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY)
+                        .appendQueryParameter("sort_by", params[0]);
                 String myUrl = builder.build().toString();
                 URL url = new URL(myUrl);
 
@@ -175,23 +180,18 @@ public class MainActivityFragment extends Fragment {
         public List<Movie> getMoviesDataFromJSON(String input) throws JSONException {
             List<Movie> result = new ArrayList<Movie>();
 
-            JSONObject spotifyJSON = new JSONObject(input);
-            JSONObject artistsJSON = spotifyJSON.getJSONObject("artists");
-            JSONArray itemsJSONArray = artistsJSON.getJSONArray("items");
+            JSONObject moviesJSON = new JSONObject(input);
+            Log.i("JSON", input);
+            JSONArray itemsJSONArray = moviesJSON.getJSONArray("results");
+            String imageSize = "w342";
 
             for (int i = 0; i < itemsJSONArray.length(); i++) {
-                JSONObject spotifyItemJSON = itemsJSONArray.getJSONObject(i);
-                String artistName = spotifyItemJSON.getString("name");
-                String artistId = spotifyItemJSON.getString("id");
-                String artistImage = null;
-                JSONArray imagesArtistJSONArray = spotifyItemJSON.getJSONArray("images");
-                for (int j = 0; j < imagesArtistJSONArray.length(); j++) {
-                    JSONObject tempImage = imagesArtistJSONArray.getJSONObject(j);
-                    if (tempImage.getInt("height") == 64) {
-                        artistImage = tempImage.getString("url");
-                    }
-                }
-                result.add(new Movie(artistId, artistName, artistImage));
+                JSONObject movieItemJSON = itemsJSONArray.getJSONObject(i);
+                String movieId = ""+ movieItemJSON.getLong("id");
+                String movieTitle = movieItemJSON.getString("title");
+                String movieImage = movieItemJSON.getString("poster_path");
+                String fullPathImage = "http://image.tmdb.org/t/p/"+imageSize+movieImage;
+                result.add(new Movie(movieId, movieTitle, fullPathImage));
             }
 
             return result;
