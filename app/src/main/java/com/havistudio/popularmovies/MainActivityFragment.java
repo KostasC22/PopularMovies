@@ -1,6 +1,7 @@
 package com.havistudio.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -33,19 +34,22 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import butterknife.OnItemSelected;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+
     private MainActivityMyAdapter mMovieAdapter;
     private Context mContext;
-
-    private GridView mGridView;
-
     @Bind(R.id.order_movies)
-    private Spinner spinner;
+    Spinner spinner;
+    @Bind(R.id.gridView_movies)
+    GridView mGridView;
 
     public MainActivityFragment() {
     }
@@ -53,18 +57,15 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, rootView);
         // get the context
         mContext = getActivity();
 
         // spinner
-        spinner = (Spinner) rootView.findViewById(R.id.order_movies);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.orderby_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        mGridView = (GridView) rootView.findViewById(R.id.gridView_movies);
-
-        ButterKnife.bind(this, rootView);
         return rootView;
     }
 
@@ -72,16 +73,35 @@ public class MainActivityFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-        Movie[] data = {new Movie("test", "test", "test")};
+        Movie[] data = {new Movie("test", "test", "test","test", "test", "test")};
         List<Movie> spotifyArtist = new ArrayList<Movie>(Arrays.asList(data));
-
         mMovieAdapter = new MainActivityMyAdapter(getActivity(), spotifyArtist, R.layout.gridview_layout_main);
+        mGridView.setAdapter(mMovieAdapter);
 
         MovieDBAPITask sat = new MovieDBAPITask();
         sat.execute(spinnerValue((String) spinner.getSelectedItem()));
+    }
 
-        mGridView.setAdapter(mMovieAdapter);
+    @OnItemSelected(R.id.order_movies)
+    void changeOnSpinner(int position) {
+        MovieDBAPITask sat = new MovieDBAPITask();
+        sat.execute(spinnerValue((String) spinner.getItemAtPosition(position)));
+    }
+
+    @OnItemClick(R.id.gridView_movies)
+    void clickOnGridViewItem(int position) {
+        Log.i("itemclick", "itemposition: " + position);
+        Movie movie = (Movie) mMovieAdapter.getItem(position);
+        Log.i(LOG_TAG, mMovieAdapter.getItem(position).toString());
+        Intent intent = new Intent(mContext, MovieActivity.class);
+        intent.putExtra("movieId", movie.getId());
+        intent.putExtra("movieTitle", movie.getTitle());
+        intent.putExtra("movieImage", movie.getImage());
+        intent.putExtra("movieOverview", movie.getOverview());
+        intent.putExtra("movieReleaseDate", movie.getReleaseDate());
+        intent.putExtra("movieAverageVote", movie.getVoteAverage());
+
+        startActivity(intent);
     }
 
     public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
@@ -169,11 +189,13 @@ public class MainActivityFragment extends Fragment {
         protected void onPostExecute(List<Movie> movies) {
             super.onPostExecute(movies);
 
-            if (movies.size() == 0) {
-                mMovieAdapter.removeAll();
-                Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
-            } else {
-                mMovieAdapter.updateResults(movies);
+            if (movies != null) {
+                if (movies.size() == 0) {
+                    mMovieAdapter.removeAll();
+                    Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
+                } else {
+                    mMovieAdapter.updateResults(movies);
+                }
             }
         }
 
@@ -187,11 +209,14 @@ public class MainActivityFragment extends Fragment {
 
             for (int i = 0; i < itemsJSONArray.length(); i++) {
                 JSONObject movieItemJSON = itemsJSONArray.getJSONObject(i);
-                String movieId = ""+ movieItemJSON.getLong("id");
+                String movieId = "" + movieItemJSON.getLong("id");
                 String movieTitle = movieItemJSON.getString("title");
                 String movieImage = movieItemJSON.getString("poster_path");
-                String fullPathImage = "http://image.tmdb.org/t/p/"+imageSize+movieImage;
-                result.add(new Movie(movieId, movieTitle, fullPathImage));
+                String movieOverview = movieItemJSON.getString("overview");
+                String movieReleaseDate = movieItemJSON.getString("release_date");
+                String movieAverageRate = ""+movieItemJSON.getDouble("vote_average");
+                String fullPathImage = "http://image.tmdb.org/t/p/" + imageSize + movieImage;
+                result.add(new Movie(movieId, movieTitle, fullPathImage, movieOverview, movieReleaseDate, movieAverageRate));
             }
 
             return result;

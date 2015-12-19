@@ -5,5 +5,7 @@
         <item>Most Popular</item>
         <item>Highest Rated</item>
     </string-array>
+    <string name="movie_activity_overview_title">Overview</string>
+    <string name="title_activity_movie">MovieActivity</string>
 
 </resources>
