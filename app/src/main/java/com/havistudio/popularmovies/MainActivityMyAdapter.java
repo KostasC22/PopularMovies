@@ -40,7 +40,6 @@ public class MainActivityMyAdapter extends BaseAdapter {
 
             holder = new MovieHolder();
             holder.imgIcon = (ImageView) row.findViewById(R.id.grid_item_image);
-            holder.txtTitle = (TextView) row.findViewById(R.id.grid_item_label);
 
             row.setTag(holder);
         } else {
@@ -48,7 +47,6 @@ public class MainActivityMyAdapter extends BaseAdapter {
         }
 
         Movie movie = data.get(position);
-        holder.txtTitle.setText(movie.getTitle());
         Picasso.with(context).load(movie.getImage()).into(holder.imgIcon);
 
         return row;
@@ -56,7 +54,6 @@ public class MainActivityMyAdapter extends BaseAdapter {
 
     static class MovieHolder {
         ImageView imgIcon;
-        TextView txtTitle;
     }
 
     @Override

@@ -74,8 +74,8 @@ public class MainActivityFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         Movie[] data = {new Movie("test", "test", "test","test", "test", "test")};
-        List<Movie> spotifyArtist = new ArrayList<Movie>(Arrays.asList(data));
-        mMovieAdapter = new MainActivityMyAdapter(getActivity(), spotifyArtist, R.layout.gridview_layout_main);
+        List<Movie> moviesList = new ArrayList<Movie>(Arrays.asList(data));
+        mMovieAdapter = new MainActivityMyAdapter(getActivity(), moviesList, R.layout.gridview_layout_main);
         mGridView.setAdapter(mMovieAdapter);
 
         MovieDBAPITask sat = new MovieDBAPITask();
