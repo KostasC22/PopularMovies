@@ -2,6 +2,7 @@ package com.havistudio.popularmovies;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,9 +79,19 @@ public class MainActivityMyAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void updateResults(ArrayList<Movie> results) {
+        data = results;
+        //Triggers the list update
+        notifyDataSetChanged();
+    }
+
     public void removeAll(){
         for(int i=0; i<data.size(); i++){
             data.remove(i);
         }
+    }
+
+    public List<Movie> getData(){
+        return data;
     }
 }

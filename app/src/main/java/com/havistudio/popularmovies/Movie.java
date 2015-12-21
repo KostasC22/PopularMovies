@@ -1,9 +1,12 @@
 package com.havistudio.popularmovies;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by kostas on 17/12/2015.
  */
-public class Movie {
+public class Movie implements Parcelable {
 
     private String id;
     private String title;
@@ -19,6 +22,15 @@ public class Movie {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.voteAverage = voteAverage;
+    }
+
+    public Movie(Parcel in) {
+        this.id = in.readString();
+        this.title = in.readString();
+        this.image = in.readString();
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.voteAverage = in.readString();
     }
 
     public String getId() {
@@ -80,4 +92,29 @@ public class Movie {
                 ", voteAverage='" + voteAverage + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getId());
+        dest.writeString(getTitle());
+        dest.writeString(getImage());
+        dest.writeString(getOverview());
+        dest.writeString(getReleaseDate());
+        dest.writeString(getVoteAverage());
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

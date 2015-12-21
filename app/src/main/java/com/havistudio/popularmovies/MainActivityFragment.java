@@ -42,17 +42,26 @@ import butterknife.OnItemSelected;
  */
 public class MainActivityFragment extends Fragment {
 
-    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    public String MOVIE_KEY = "movies";
 
-    private MainActivityMyAdapter mMovieAdapter;
-    private Context mContext;
     @Bind(R.id.order_movies)
     Spinner spinner;
     @Bind(R.id.gridView_movies)
     GridView mGridView;
 
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    private MainActivityMyAdapter mMovieAdapter;
+    private Context mContext;
+
     public MainActivityFragment() {
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIE_KEY, (ArrayList<Movie>) mMovieAdapter.getData());
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +69,6 @@ public class MainActivityFragment extends Fragment {
         ButterKnife.bind(this, rootView);
         // get the context
         mContext = getActivity();
-
         // spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.orderby_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -73,13 +81,18 @@ public class MainActivityFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Movie[] data = {new Movie("test", "test", "test","test", "test", "test")};
-        List<Movie> moviesList = new ArrayList<Movie>(Arrays.asList(data));
+        List<Movie> moviesList;
+
+        if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_KEY)) {
+            Movie[] data = {new Movie("test", "test", "test","test", "test", "test")};
+            moviesList = new ArrayList<Movie>(Arrays.asList(data));
+            MovieDBAPITask sat = new MovieDBAPITask(mMovieAdapter, mContext);
+            sat.execute(spinnerValue((String) spinner.getSelectedItem()));
+        }else{
+            moviesList = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
+        }
         mMovieAdapter = new MainActivityMyAdapter(getActivity(), moviesList, R.layout.gridview_layout_main);
         mGridView.setAdapter(mMovieAdapter);
-
-        MovieDBAPITask sat = new MovieDBAPITask(mMovieAdapter, mContext);
-        sat.execute(spinnerValue((String) spinner.getSelectedItem()));
     }
 
     @OnItemSelected(R.id.order_movies)
