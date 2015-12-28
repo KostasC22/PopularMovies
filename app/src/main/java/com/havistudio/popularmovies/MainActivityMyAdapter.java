@@ -3,6 +3,7 @@ package com.havistudio.popularmovies;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ public class MainActivityMyAdapter extends BaseAdapter {
     private Context context;
     private List<Movie> data = null;
     private int layoutResourceId;
+    private String imageSize = "w342";
 
     public MainActivityMyAdapter(Context context, List<Movie> data, int layoutResourceId) {
         this.context = context;
@@ -49,7 +51,23 @@ public class MainActivityMyAdapter extends BaseAdapter {
         }
 
         Movie movie = data.get(position);
-        Picasso.with(context).load(movie.getImage()).into(holder.imgIcon);
+//        if(convertView != null) {
+//            int width = convertView.getWidth();
+//            int height = convertView.getHeight();
+//            Log.i("Test", "w:" + width + " h:" + height);
+//
+//            if(width > 0 && height > 0){
+//                Picasso.with(context).load(ImageUtil.makeImageFullPath(movie.getImage(), "w342")).placeholder(R.mipmap.ic_launcher).error(R.mipmap.symbols_warning)
+//                        .resize(width, height)
+//                        .centerCrop()
+//                        .into(holder.imgIcon);
+//            }else{
+//                Picasso.with(context).load(ImageUtil.makeImageFullPath(movie.getImage(), "w342")).placeholder(R.mipmap.ic_launcher).error(R.mipmap.symbols_warning).into(holder.imgIcon);
+//            }
+//        }else{
+//            Picasso.with(context).load(ImageUtil.makeImageFullPath(movie.getImage(), "w342")).placeholder(R.mipmap.ic_launcher).error(R.mipmap.symbols_warning).into(holder.imgIcon);
+//        }
+        Picasso.with(context).load(ImageUtil.makeImageFullPath(movie.getImage(), "w342")).placeholder(R.mipmap.ic_launcher).error(R.mipmap.symbols_warning).fit().into(holder.imgIcon);
 
         return row;
     }
