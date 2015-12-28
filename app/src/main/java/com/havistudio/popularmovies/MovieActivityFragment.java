@@ -40,7 +40,7 @@ public class MovieActivityFragment extends Fragment {
         // Get the intent information
         Intent intent = getActivity().getIntent();
 
-        Picasso.with(getActivity()).load(intent.getStringExtra("movieImage")).into(posterImageView);
+        Picasso.with(getActivity()).load(ImageUtil.makeImageFullPath(intent.getStringExtra("movieImage"), "w342")).into(posterImageView);
         textviewOverviewText.setText(intent.getStringExtra("movieOverview"));
         textviewReleaseDate.setText("Release Date: "+intent.getStringExtra("movieReleaseDate"));
         textviewAverageRating.setText("Average Rating: "+intent.getStringExtra("movieAverageVote"));

@@ -3,19 +3,31 @@ package com.havistudio.popularmovies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by kostas on 17/12/2015.
  */
 public class Movie implements Parcelable {
 
-    private String id;
+    @SerializedName("id")
+    private long id;
+    @SerializedName("title")
     private String title;
+    @SerializedName("poster_path")
     private String image;
+    @SerializedName("overview")
     private String overview;
+    @SerializedName("release_date")
     private String releaseDate;
+    @SerializedName("vote_average")
     private String voteAverage;
 
-    public Movie(String id, String title, String image, String overview, String releaseDate, String voteAverage) {
+    public Movie(){
+
+    }
+
+    public Movie(long id, String title, String image, String overview, String releaseDate, String voteAverage) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -25,7 +37,7 @@ public class Movie implements Parcelable {
     }
 
     public Movie(Parcel in) {
-        this.id = in.readString();
+        this.id = in.readLong();
         this.title = in.readString();
         this.image = in.readString();
         this.overview = in.readString();
@@ -33,11 +45,11 @@ public class Movie implements Parcelable {
         this.voteAverage = in.readString();
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -100,7 +112,7 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(getId());
+        dest.writeLong(getId());
         dest.writeString(getTitle());
         dest.writeString(getImage());
         dest.writeString(getOverview());

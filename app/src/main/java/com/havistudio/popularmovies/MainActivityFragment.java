@@ -84,7 +84,7 @@ public class MainActivityFragment extends Fragment {
         List<Movie> moviesList;
 
         if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_KEY)) {
-            Movie[] data = {new Movie("test", "test", "test","test", "test", "test")};
+            Movie[] data = {new Movie(0, "test", "test","test", "test", "test")};
             moviesList = new ArrayList<Movie>(Arrays.asList(data));
             MovieDBAPITask sat = new MovieDBAPITask(mMovieAdapter, mContext);
             sat.execute(spinnerValue((String) spinner.getSelectedItem()));

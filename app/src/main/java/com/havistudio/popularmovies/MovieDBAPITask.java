@@ -17,7 +17,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit.Call;
+import retrofit.CallAdapter;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by kostas on 21/12/2015.
@@ -50,62 +58,22 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
             return null;
         }
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://api.themoviedb.org/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        MyApiRetrofit service = retrofit.create(MyApiRetrofit.class);
+
+        Map<String,String> temp = new HashMap<String,String>();
+        temp.put("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY);
+        temp.put("sort_by", params[0]);
+
+        Call<MovieJSON> call = service.getMovies(temp);
         try {
-
-            Uri.Builder builder = new Uri.Builder();
-            builder.scheme("http")
-                    .authority("api.themoviedb.org")
-                    .appendPath("3")
-                    .appendPath("discover")
-                    .appendPath("movie")
-                    .appendQueryParameter("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY)
-                    .appendQueryParameter("sort_by", params[0]);
-            String myUrl = builder.build().toString();
-            URL url = new URL(myUrl);
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            moviesJsonStr = buffer.toString();
-            result = getMoviesDataFromJSON(moviesJsonStr);
-
+            Response<MovieJSON> tempo = call.execute();
+            result = tempo.body().getmMovies();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(LOG_TAG, "Error ", e);
-            return null;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(LOG_TAG, "Error ", e);
-            return null;
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
         }
 
         return result;
@@ -120,31 +88,11 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
                 mMovieAdapter.removeAll();
                 Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
             } else {
-                mMovieAdapter.updateResults(movies);
+                if(mMovieAdapter != null){
+                    mMovieAdapter.updateResults(movies);
+                }
             }
         }
     }
 
-    public List<Movie> getMoviesDataFromJSON(String input) throws JSONException {
-        List<Movie> result = new ArrayList<Movie>();
-
-        JSONObject moviesJSON = new JSONObject(input);
-        Log.i("JSON", input);
-        JSONArray itemsJSONArray = moviesJSON.getJSONArray("results");
-        String imageSize = "w342";
-
-        for (int i = 0; i < itemsJSONArray.length(); i++) {
-            JSONObject movieItemJSON = itemsJSONArray.getJSONObject(i);
-            String movieId = "" + movieItemJSON.getLong("id");
-            String movieTitle = movieItemJSON.getString("title");
-            String movieImage = movieItemJSON.getString("poster_path");
-            String movieOverview = movieItemJSON.getString("overview");
-            String movieReleaseDate = movieItemJSON.getString("release_date");
-            String movieAverageRate = ""+movieItemJSON.getDouble("vote_average");
-            String fullPathImage = "http://image.tmdb.org/t/p/" + imageSize + movieImage;
-            result.add(new Movie(movieId, movieTitle, fullPathImage, movieOverview, movieReleaseDate, movieAverageRate));
-        }
-
-        return result;
-    }
 }
