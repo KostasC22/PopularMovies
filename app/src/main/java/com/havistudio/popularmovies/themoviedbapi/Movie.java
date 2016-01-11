@@ -1,4 +1,4 @@
-package com.havistudio.popularmovies;
+package com.havistudio.popularmovies.themoviedbapi;
 
 import android.os.Parcel;
 import android.os.Parcelable;

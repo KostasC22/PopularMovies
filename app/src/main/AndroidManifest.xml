@@ -29,6 +29,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.havistudio.popularmovies.MainActivity" />
         </activity>
+        <provider
+            android:authorities="com.havistudio.popularmovies"
+            android:name=".db.MyContentProvider" />
     </application>
 
 </manifest>

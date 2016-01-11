@@ -1,50 +1,44 @@
-package com.havistudio.popularmovies;
+package com.havistudio.popularmovies.themoviedbapi;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.havistudio.popularmovies.BuildConfig;
+import com.havistudio.popularmovies.VideoAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import retrofit.Call;
-import retrofit.CallAdapter;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
- * Created by kostas on 21/12/2015.
+ * Created by kostas on 31/12/2015.
  */
-public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
+public class VideoDBAPITask extends AsyncTask<String, Void, List<Video>> {
 
-    private final String LOG_TAG = MovieDBAPITask.class.getSimpleName();
+    private final String LOG_TAG = VideoDBAPITask.class.getSimpleName();
 
-    private MainActivityMyAdapter mMovieAdapter;
+    private VideoAdapter mVideoAdapter;
     private Context mContext;
 
-    public MovieDBAPITask(MainActivityMyAdapter mMovieAdapter, Context mContext){
-        this.mMovieAdapter = mMovieAdapter;
+    public VideoDBAPITask(VideoAdapter mMovieAdapter, Context mContext){
+        this.mVideoAdapter = mMovieAdapter;
         this.mContext = mContext;
     }
 
     @Override
-    protected List<Movie> doInBackground(String... params) {
-        List<Movie> result = new ArrayList<Movie>();
+    protected List<Video> doInBackground(String... params) {
+        List<Video> result = new ArrayList<Video>();
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -58,20 +52,26 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
             return null;
         }
 
+//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        OkHttpClient httpClient = new OkHttpClient();
+//        httpClient.interceptors().add(logging);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.themoviedb.org/")
                 .addConverterFactory(GsonConverterFactory.create())
+//                .client(httpClient)
                 .build();
         MyApiRetrofit service = retrofit.create(MyApiRetrofit.class);
 
+
         Map<String,String> temp = new HashMap<String,String>();
         temp.put("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY);
-        temp.put("sort_by", params[0]);
 
-        Call<MovieJSON> call = service.getMovies(temp);
+        Call<VideoJson> call = service.getVideos(Long.parseLong(params[0]),temp);
         try {
-            Response<MovieJSON> tempo = call.execute();
-            result = tempo.body().getmMovies();
+            Response<VideoJson> tempo = call.execute();
+            result = tempo.body().getmVideos();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,19 +80,18 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
     }
 
     @Override
-    protected void onPostExecute(List<Movie> movies) {
-        super.onPostExecute(movies);
-
-        if (movies != null) {
-            if (movies.size() == 0) {
-                mMovieAdapter.removeAll();
+    protected void onPostExecute(List<Video> videos) {
+        super.onPostExecute(videos);
+        Log.i(LOG_TAG,""+videos.size());
+        if (videos != null) {
+            if (videos.size() == 0) {
+                mVideoAdapter.removeAll();
                 Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
             } else {
-                if(mMovieAdapter != null){
-                    mMovieAdapter.updateResults(movies);
+                if(mVideoAdapter != null){
+                    mVideoAdapter.updateResults(videos);
                 }
             }
         }
     }
-
 }
