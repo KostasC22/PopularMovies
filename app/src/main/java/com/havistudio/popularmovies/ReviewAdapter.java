@@ -2,29 +2,28 @@ package com.havistudio.popularmovies;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.havistudio.popularmovies.themoviedbapi.Movie;
-import com.squareup.picasso.Picasso;
+import com.havistudio.popularmovies.themoviedbapi.Review;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kostas on 16/12/2015.
+ * Created by kostas on 02/01/2016.
  */
-public class MainActivityMyAdapter extends BaseAdapter {
+public class ReviewAdapter extends BaseAdapter {
 
     private Context context;
-    private List<Movie> data = null;
+    private List<Review> data = null;
     private int layoutResourceId;
-    private String imageSize = "w342";
 
-    public MainActivityMyAdapter(Context context, List<Movie> data, int layoutResourceId) {
+    public ReviewAdapter(Context context, List<Review> data, int layoutResourceId) {
         this.context = context;
         this.data = data;
         this.layoutResourceId = layoutResourceId;
@@ -33,29 +32,32 @@ public class MainActivityMyAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View row = convertView;
-        MovieHolder holder = null;
+        ReviewHolder holder = null;
 
         if (row == null) {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new MovieHolder();
-            holder.imgIcon = (ImageView) row.findViewById(R.id.grid_item_image);
+            holder = new ReviewHolder();
+            holder.author = (TextView) row.findViewById(R.id.textView_comment_author);
+            holder.content = (TextView) row.findViewById(R.id.textView_comment_content);
 
             row.setTag(holder);
         } else {
-            holder = (MovieHolder) row.getTag();
+            holder = (ReviewHolder) row.getTag();
         }
 
-        Movie movie = data.get(position);
-
-        Picasso.with(context).load(ImageUtil.makeImageFullPath(movie.getImage(), "w342")).placeholder(R.mipmap.ic_launcher).error(R.mipmap.symbols_warning).fit().into(holder.imgIcon);
+        Review review = data.get(position);
+        Log.i("ReviewAdapter", review.toString());
+        holder.author.setText(review.getAuthor());
+        holder.content.setText(review.getContent());
 
         return row;
     }
 
-    static class MovieHolder {
-        ImageView imgIcon;
+    static class ReviewHolder {
+        TextView author;
+        TextView content;
     }
 
     @Override
@@ -73,13 +75,13 @@ public class MainActivityMyAdapter extends BaseAdapter {
         return 0;
     }
 
-    public void updateResults(List<Movie> results) {
+    public void updateResults(List<Review> results) {
         data = results;
         //Triggers the list update
         notifyDataSetChanged();
     }
 
-    public void updateResults(ArrayList<Movie> results) {
+    public void updateResults(ArrayList<Review> results) {
         data = results;
         //Triggers the list update
         notifyDataSetChanged();
@@ -91,7 +93,7 @@ public class MainActivityMyAdapter extends BaseAdapter {
         }
     }
 
-    public List<Movie> getData(){
+    public List<Review> getData(){
         return data;
     }
 }
