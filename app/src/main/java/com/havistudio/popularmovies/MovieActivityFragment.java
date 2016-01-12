@@ -52,6 +52,12 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
             Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID
     };
 
+    public static final int COL_FAVORITE_ID = 0;
+    public static final int COL_FAVORITE_SELECTED = 1;
+    public static final int COL_FAVORITE_MOVIEDB_ID = 2;
+
+    private int tempSelectedFavorite = 0;
+
     @Bind(R.id.imageview_poster_img)
     ImageView posterImageView;
     @Bind(R.id.textview_overview_text)
@@ -139,7 +145,15 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         Log.i("onLoadFinished", cursorLoader.toString());
-        //Log.i("onLoadFinished",cursor.toString());
+        Log.i("onLoadFinished",cursor.toString());
+        if (cursor != null && cursor.moveToFirst()) {
+            int selectedFavorite = cursor.getInt(COL_FAVORITE_SELECTED);
+            Log.i("onLoadFinished","selectedFavorite:"+selectedFavorite);
+            if(selectedFavorite == 1){
+                tempSelectedFavorite = 1;
+                buttonFavorite.setText("Unfavorite");
+            }
+        }
     }
 
     @Override
@@ -150,11 +164,14 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
     @OnClick(R.id.is_favorite)
     public void makeFavorite() {
         Log.i("ButtonAT", "Button Pressed!");
+        buttonFavorite.setEnabled(false);
         MakeFavoriteAsyncTask mfat = new MakeFavoriteAsyncTask();
         mfat.execute();
     }
 
     private class MakeFavoriteAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private String tempText = "Unfavorite";
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -173,7 +190,17 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
             if (favoriteCursor.moveToFirst()) {
                 Log.i("doInBackground", "Id already exists!");
-
+                if(tempSelectedFavorite == 0){
+                    tempSelectedFavorite = 1;
+                }else{
+                    tempSelectedFavorite = 0;
+                    tempText = "Favorite";
+                }
+                MyDbHelper dbHelper = new MyDbHelper(mContext);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues myValues = new ContentValues();
+                myValues.put(Contract.FavoritiesEntry.COLUMN_SELECTED, tempSelectedFavorite);
+                db.update(Contract.FavoritiesEntry.TABLE_NAME, myValues, Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID + "= ?", new String[]{movieId});
             }else{
                 Log.i("doInBackground","Id it doesn't exist!");
                 MyDbHelper dbHelper = new MyDbHelper(mContext);
@@ -186,5 +213,11 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
             return null;
         }
+
+        protected void onPostExecute(Void result) {
+            buttonFavorite.setText(tempText);
+            buttonFavorite.setEnabled(true);
+        }
+
     }
 }
