@@ -44,6 +44,9 @@ import butterknife.OnClick;
  */
 public class MovieActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    static final String MOVIE_FRAGMENT = "MOVIE";
+    private Movie mMovie;
+
     private static final int FAVORITES_LOADER = 0;
 
     private static final String[] FAVORITES_COLUMNS = {
@@ -80,19 +83,28 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
     private String movieId;
 
     public MovieActivityFragment() {
+        Log.i("MovieActivityFragment",mMovie+"");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie, container, false);
         ButterKnife.bind(this, rootView);
+        //
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mMovie = arguments.getParcelable(MovieActivityFragment.MOVIE_FRAGMENT);
+        }
         // get the context
         mContext = getActivity();
         // Get the intent information
         Intent intent = getActivity().getIntent();
         movieId = intent.getLongExtra("movieId", 0) + "";
-        Log.i(LOG_TAG, movieId);
-
+        Log.i(LOG_TAG, "1: "+movieId);
+        Log.i(LOG_TAG, "2: " + mMovie);
+        if(mMovie != null){
+            movieId = mMovie.getId()+"";
+        }
 
         Picasso.with(getActivity()).load(ImageUtil.makeImageFullPath(intent.getStringExtra("movieImage"), "w342")).into(posterImageView);
         textviewOverviewText.setText(intent.getStringExtra("movieOverview"));
@@ -109,20 +121,24 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
         List<Video> videosList;
         List<Review> reviewsList;
-        // Trailers
-        Video[] data = {new Video("0", "test", "test", "test")};
-        videosList = new ArrayList<Video>(Arrays.asList(data));
-        VideoDBAPITask videoTask = new VideoDBAPITask(mVideoAdapter, mContext);
-        videoTask.execute(movieId);
-        mVideoAdapter = new VideoAdapter(getActivity(), videosList, R.layout.listview_trailer_buttons);
-        mButtonsListView.setAdapter(mVideoAdapter);
-        // Comments
-        Review[] dataReview = {new Review("test", "test", "test", "test")};
-        reviewsList = new ArrayList<Review>(Arrays.asList(dataReview));
-        ReviewDBAPITask sat = new ReviewDBAPITask(mReviewAdapter, mContext);
-        sat.execute(movieId);
-        mReviewAdapter = new ReviewAdapter(getActivity(), reviewsList, R.layout.listview_users_comments);
-        mCommentsListView.setAdapter(mReviewAdapter);
+        if(mMovie != null) {
+            if (mMovie.getId() > 0) {
+                // Trailers
+                Video[] data = {new Video("0", "test", "test", "test")};
+                videosList = new ArrayList<Video>(Arrays.asList(data));
+                VideoDBAPITask videoTask = new VideoDBAPITask(mVideoAdapter, mContext);
+                videoTask.execute(movieId);
+                mVideoAdapter = new VideoAdapter(getActivity(), videosList, R.layout.listview_trailer_buttons);
+                mButtonsListView.setAdapter(mVideoAdapter);
+                // Comments
+                Review[] dataReview = {new Review("test", "test", "test", "test")};
+                reviewsList = new ArrayList<Review>(Arrays.asList(dataReview));
+                ReviewDBAPITask sat = new ReviewDBAPITask(mReviewAdapter, mContext);
+                sat.execute(movieId);
+                mReviewAdapter = new ReviewAdapter(getActivity(), reviewsList, R.layout.listview_users_comments);
+                mCommentsListView.setAdapter(mReviewAdapter);
+            }
+        }
     }
 
     @Override
