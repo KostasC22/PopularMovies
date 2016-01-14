@@ -52,11 +52,6 @@ public class VideoDBAPITask extends AsyncTask<String, Void, List<Video>> {
             return null;
         }
 
-//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        OkHttpClient httpClient = new OkHttpClient();
-//        httpClient.interceptors().add(logging);
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.themoviedb.org/")
                 .addConverterFactory(GsonConverterFactory.create())

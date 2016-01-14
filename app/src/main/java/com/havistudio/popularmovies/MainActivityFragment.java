@@ -2,6 +2,7 @@ package com.havistudio.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -42,6 +43,12 @@ public class MainActivityFragment extends Fragment {
     private Context mContext;
 
     public MainActivityFragment() {
+    }
+
+    public interface Callback {
+
+        public void onItemSelected(Movie tempMovie);
+
     }
 
     @Override
@@ -93,7 +100,7 @@ public class MainActivityFragment extends Fragment {
     void clickOnGridViewItem(int position) {
         Log.i("itemclick", "itemposition: " + position);
         Movie movie = (Movie) mMovieAdapter.getItem(position);
-        Log.i(LOG_TAG, mMovieAdapter.getItem(position).toString());
+        Log.i(LOG_TAG, movie.toString());
         Intent intent = new Intent(mContext, MovieActivity.class);
         intent.putExtra("movieId", movie.getId());
         intent.putExtra("movieTitle", movie.getTitle());
@@ -101,8 +108,11 @@ public class MainActivityFragment extends Fragment {
         intent.putExtra("movieOverview", movie.getOverview());
         intent.putExtra("movieReleaseDate", movie.getReleaseDate());
         intent.putExtra("movieAverageVote", movie.getVoteAverage());
+        intent.putExtra("movie", movie);
 
-        startActivity(intent);
+        ((Callback) getActivity())
+                .onItemSelected(movie);
+
     }
 
     private static String spinnerValue(String value) {
