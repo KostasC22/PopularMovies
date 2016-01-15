@@ -102,14 +102,22 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         movieId = intent.getLongExtra("movieId", 0) + "";
         Log.i(LOG_TAG, "1: "+movieId);
         Log.i(LOG_TAG, "2: " + mMovie);
+        String tempMovieImage = intent.getStringExtra("movieImage");
+        String tempMovieOverview = intent.getStringExtra("movieOverview");
+        String tempMovieReview = "Release Date: " + intent.getStringExtra("movieReleaseDate");
+        String tempMovieAverageRating = "Average Rating: " + intent.getStringExtra("movieAverageVote");
         if(mMovie != null){
             movieId = mMovie.getId()+"";
+            tempMovieImage = mMovie.getImage();
+            tempMovieOverview = mMovie.getOverview();
+            tempMovieReview = "Release Date: " + mMovie.getReleaseDate();
+            tempMovieAverageRating = "Average Rating: " +  mMovie.getVoteAverage();
         }
 
-        Picasso.with(getActivity()).load(ImageUtil.makeImageFullPath(intent.getStringExtra("movieImage"), "w342")).into(posterImageView);
-        textviewOverviewText.setText(intent.getStringExtra("movieOverview"));
-        textviewReleaseDate.setText("Release Date: " + intent.getStringExtra("movieReleaseDate"));
-        textviewAverageRating.setText("Average Rating: " + intent.getStringExtra("movieAverageVote"));
+        Picasso.with(getActivity()).load(ImageUtil.makeImageFullPath(tempMovieImage, "w342")).into(posterImageView);
+        textviewOverviewText.setText(tempMovieOverview);
+        textviewReleaseDate.setText(tempMovieReview);
+        textviewAverageRating.setText(tempMovieAverageRating);
 
         return rootView;
     }
