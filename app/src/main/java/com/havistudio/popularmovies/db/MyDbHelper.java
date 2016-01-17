@@ -11,7 +11,7 @@ import com.havistudio.popularmovies.db.Contract.FavoritiesEntry;
  */
 public class MyDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "popularmovies.db";
 
     public MyDbHelper(Context context) {
@@ -24,7 +24,12 @@ public class MyDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_FAVORITIES_TABLE = "CREATE TABLE " + FavoritiesEntry.TABLE_NAME + " (" +
                 FavoritiesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 FavoritiesEntry.COLUMN_SELECTED + " INTEGER NOT NULL, " +
-                FavoritiesEntry.COLUMN_MOVIEDB_ID + " INTEGER UNIQUE NOT NULL " +
+                FavoritiesEntry.COLUMN_MOVIEDB_ID + " INTEGER UNIQUE NOT NULL, " +
+                FavoritiesEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
+                FavoritiesEntry.COLUMN_IMAGE + " TEXT NOT NULL, " +
+                FavoritiesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                FavoritiesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
+                FavoritiesEntry.COLUMN_AVERAGE_RATING + " TEXT NOT NULL " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_FAVORITIES_TABLE);

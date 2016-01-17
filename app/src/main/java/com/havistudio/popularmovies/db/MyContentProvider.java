@@ -45,7 +45,6 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         mOpenHelper = new MyDbHelper(getContext());
-        Log.i("MyContentProvider","Constructor ---------------------------------");
         return false;
     }
 
@@ -113,6 +112,8 @@ public class MyContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
+
+
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {

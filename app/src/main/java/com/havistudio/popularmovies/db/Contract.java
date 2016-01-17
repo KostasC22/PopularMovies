@@ -19,14 +19,6 @@ public class Contract {
 
     public static final String PATH_FAVORITES = "favorites";
 
-    public static long normalizeDate(long startDate) {
-        // normalize the start date to the beginning of the (UTC) day
-        Time time = new Time();
-        time.set(startDate);
-        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
-        return time.setJulianDay(julianDay);
-    }
-
     public static final class FavoritiesEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITES).build();
@@ -39,6 +31,11 @@ public class Contract {
         public static final String TABLE_NAME = "favorities";
         public static final String COLUMN_SELECTED = "selected";
         public static final String COLUMN_MOVIEDB_ID = "moviedb_id";
+        public static final String COLUMN_TITLE = "title";
+        public static final String COLUMN_IMAGE = "image";
+        public static final String COLUMN_OVERVIEW = "overview";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
+        public static final String COLUMN_AVERAGE_RATING = "overview";
 
         public static Uri buildFavoritiesUri(long id) {
             return CONTENT_URI.buildUpon().appendPath("" + id).build();
@@ -46,7 +43,6 @@ public class Contract {
 
         public static long getMovieId(Uri uri) {
             String dateString = uri.getLastPathSegment();
-            Log.i("FavoritiesEntry", ""+dateString);
             if (null != dateString && dateString.length() > 0)
                 return Long.parseLong(dateString);
             else
