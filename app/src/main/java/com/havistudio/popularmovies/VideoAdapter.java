@@ -50,14 +50,11 @@ public class VideoAdapter extends BaseAdapter {
 
         final Video video = data.get(position);
         Log.i("VideoAdapter", video.toString());
-        holder.trailer.setText("Trailer "+(position+1)+" "+video.getSite());
+        holder.trailer.setText("Trailer " + (position + 1) + " " + video.getSite());
         holder.trailer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
-                Log.i("MovieYoutube", "https://www.youtube.com/watch?v=" + video.getKey());
-                intent.setDataAndType(Uri.parse("https://www.youtube.com/watch?v=" + video.getKey()), "video/mp4");
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + video.getKey()));
                 context.startActivity(intent);
             }
         });
@@ -86,23 +83,16 @@ public class VideoAdapter extends BaseAdapter {
 
     public void updateResults(List<Video> results) {
         data = results;
-        //Triggers the list update
         notifyDataSetChanged();
     }
 
-    public void updateResults(ArrayList<Video> results) {
-        data = results;
-        //Triggers the list update
-        notifyDataSetChanged();
-    }
-
-    public void removeAll(){
-        for(int i=0; i<data.size(); i++){
+    public void removeAll() {
+        for (int i = 0; i < data.size(); i++) {
             data.remove(i);
         }
     }
 
-    public List<Video> getData(){
+    public List<Video> getData() {
         return data;
     }
 }
