@@ -72,12 +72,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
         } else {
             Intent intent = new Intent(this, MovieActivity.class)
                     .putExtra("movie", tempMovie);
-            intent.putExtra("movieId", tempMovie.getId());
-            intent.putExtra("movieTitle", tempMovie.getTitle());
-            intent.putExtra("movieImage", tempMovie.getImage());
-            intent.putExtra("movieOverview", tempMovie.getOverview());
-            intent.putExtra("movieReleaseDate", tempMovie.getReleaseDate());
-            intent.putExtra("movieAverageVote", tempMovie.getVoteAverage());
             startActivity(intent);
         }
     }

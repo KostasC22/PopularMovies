@@ -99,13 +99,11 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         mContext = getActivity();
         // Get the intent information
         Intent intent = getActivity().getIntent();
-        movieId = intent.getLongExtra("movieId", 0) + "";
-        Log.i(LOG_TAG, "1: "+movieId);
-        Log.i(LOG_TAG, "2: " + mMovie);
-        String tempMovieImage = intent.getStringExtra("movieImage");
-        String tempMovieOverview = intent.getStringExtra("movieOverview");
-        String tempMovieReview = "Release Date: " + intent.getStringExtra("movieReleaseDate");
-        String tempMovieAverageRating = "Average Rating: " + intent.getStringExtra("movieAverageVote");
+        movieId = 0+"";
+        String tempMovieImage = "";
+        String tempMovieOverview = "";
+        String tempMovieReview = "";
+        String tempMovieAverageRating = "";
         if(mMovie != null){
             movieId = mMovie.getId()+"";
             tempMovieImage = mMovie.getImage();
@@ -132,19 +130,19 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         if(mMovie != null) {
             if (mMovie.getId() > 0) {
                 // Trailers
-                Video[] data = {new Video("0", "test", "test", "test")};
-                videosList = new ArrayList<Video>(Arrays.asList(data));
-                VideoDBAPITask videoTask = new VideoDBAPITask(mVideoAdapter, mContext);
+//                Video[] data = {new Video("0", "test", "test", "test")};
+//                videosList = new ArrayList<Video>(Arrays.asList(data));
+                VideoDBAPITask videoTask = new VideoDBAPITask(mVideoAdapter, mContext, mButtonsListView);
                 videoTask.execute(movieId);
-                mVideoAdapter = new VideoAdapter(getActivity(), videosList, R.layout.listview_trailer_buttons);
-                mButtonsListView.setAdapter(mVideoAdapter);
+//                mVideoAdapter = new VideoAdapter(getActivity(), videosList, R.layout.listview_trailer_buttons);
+//                mButtonsListView.setAdapter(mVideoAdapter);
                 // Comments
-                Review[] dataReview = {new Review("test", "test", "test", "test")};
-                reviewsList = new ArrayList<Review>(Arrays.asList(dataReview));
-                ReviewDBAPITask sat = new ReviewDBAPITask(mReviewAdapter, mContext);
+//                Review[] dataReview = {new Review("test", "test", "test", "test")};
+//                reviewsList = new ArrayList<Review>(Arrays.asList(dataReview));
+                ReviewDBAPITask sat = new ReviewDBAPITask(mReviewAdapter, mContext, mCommentsListView);
                 sat.execute(movieId);
-                mReviewAdapter = new ReviewAdapter(getActivity(), reviewsList, R.layout.listview_users_comments);
-                mCommentsListView.setAdapter(mReviewAdapter);
+//                mReviewAdapter = new ReviewAdapter(getActivity(), reviewsList, R.layout.listview_users_comments);
+//                mCommentsListView.setAdapter(mReviewAdapter);
             }
         }
     }
@@ -154,9 +152,6 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
         Uri favoritesUri = Contract.FavoritiesEntry.buildFavoritiesUri(Long.parseLong(movieId));
         CursorLoader temp = new CursorLoader(getActivity(), favoritesUri, FAVORITES_COLUMNS, null, null, null);
-        Log.i("onCreateLoader", "movieId:" + movieId);
-        Log.i("onCreateLoader", "favoritesUri:" + favoritesUri);
-        Log.i("onCreateLoader", "CursorLoader:" + temp.toString());
 
         return new CursorLoader(getActivity(),
                 favoritesUri,
@@ -168,11 +163,8 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Log.i("onLoadFinished", cursorLoader.toString());
-        Log.i("onLoadFinished",cursor.toString());
         if (cursor != null && cursor.moveToFirst()) {
             int selectedFavorite = cursor.getInt(COL_FAVORITE_SELECTED);
-            Log.i("onLoadFinished","selectedFavorite:"+selectedFavorite);
             if(selectedFavorite == 1){
                 tempSelectedFavorite = 1;
                 buttonFavorite.setText("Unfavorite");
@@ -187,61 +179,9 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
 
     @OnClick(R.id.is_favorite)
     public void makeFavorite() {
-        Log.i("ButtonAT", "Button Pressed!");
         buttonFavorite.setEnabled(false);
-        MakeFavoriteAsyncTask mfat = new MakeFavoriteAsyncTask();
+        MakeFavoriteAsyncTask mfat = new MakeFavoriteAsyncTask(getActivity(), mMovie.getId()+"", buttonFavorite, tempSelectedFavorite);
         mfat.execute();
     }
 
-    private class MakeFavoriteAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        private String tempText = "Unfavorite";
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Log.i("doInBackground", "Start");
-            Log.i("doInBackground",Contract.FavoritiesEntry.buildFavoritiesUri(Long.parseLong(movieId)).toString());
-            Cursor favoriteCursor = getContext().getContentResolver().query(
-                    Contract.FavoritiesEntry.buildFavoritiesUri(Long.parseLong(movieId)),
-                    new String[]{
-                            Contract.FavoritiesEntry._ID,
-                            Contract.FavoritiesEntry.COLUMN_SELECTED,
-                            Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID
-                    },
-                    Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID + " = ?",
-                    new String[]{movieId},
-                    null);
-
-            if (favoriteCursor.moveToFirst()) {
-                Log.i("doInBackground", "Id already exists!");
-                if(tempSelectedFavorite == 0){
-                    tempSelectedFavorite = 1;
-                }else{
-                    tempSelectedFavorite = 0;
-                    tempText = "Favorite";
-                }
-                MyDbHelper dbHelper = new MyDbHelper(mContext);
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues myValues = new ContentValues();
-                myValues.put(Contract.FavoritiesEntry.COLUMN_SELECTED, tempSelectedFavorite);
-                db.update(Contract.FavoritiesEntry.TABLE_NAME, myValues, Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID + "= ?", new String[]{movieId});
-            }else{
-                Log.i("doInBackground","Id it doesn't exist!");
-                MyDbHelper dbHelper = new MyDbHelper(mContext);
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues myValues = new ContentValues();
-                myValues.put(Contract.FavoritiesEntry.COLUMN_SELECTED, 1);
-                myValues.put(Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID, movieId);
-                db.insert(Contract.FavoritiesEntry.TABLE_NAME, null, myValues);
-            }
-
-            return null;
-        }
-
-        protected void onPostExecute(Void result) {
-            buttonFavorite.setText(tempText);
-            buttonFavorite.setEnabled(true);
-        }
-
-    }
 }
