@@ -79,12 +79,12 @@ public class MainActivityFragment extends Fragment {
 
         List<Movie> moviesList;
 
-        if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_KEY)) {
-            Movie[] data = {new Movie(0, "test", "test","test", "test", "test")};
+        if (savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_KEY)) {
+            Movie[] data = {new Movie(0, "test", "test", "test", "test", "test")};
             moviesList = new ArrayList<Movie>(Arrays.asList(data));
             MovieDBAPITask sat = new MovieDBAPITask(mMovieAdapter, mContext);
             sat.execute(spinnerValue((String) spinner.getSelectedItem()));
-        }else{
+        } else {
             moviesList = savedInstanceState.getParcelableArrayList(MOVIE_KEY);
         }
         mMovieAdapter = new MainActivityMyAdapter(getActivity(), moviesList, R.layout.gridview_layout_main);
@@ -122,6 +122,8 @@ public class MainActivityFragment extends Fragment {
             result = "popularity.desc";
         } else if (value.equals("Highest Rated")) {
             result = "vote_average.desc";
+        } else if (value.equals("Favorites")) {
+            result = "favorites";
         } else {
             result = "popularity.desc";
         }
