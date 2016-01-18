@@ -87,7 +87,9 @@ public class ReviewDBAPITask extends AsyncTask<String, Void, List<Review>> {
         Log.i(LOG_TAG, "" + reviews.size());
         if (reviews != null) {
             if (reviews.size() == 0) {
-                mReviewAdapter.removeAll();
+                if(mReviewAdapter != null) {
+                    mReviewAdapter.removeAll();
+                }
                 Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
             } else {
                 mReviewAdapter = new ReviewAdapter(mContext, reviews, R.layout.listview_users_comments);

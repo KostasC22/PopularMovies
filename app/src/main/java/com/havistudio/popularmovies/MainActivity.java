@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityFragm
 
     @Override
     public void onItemSelected(Movie tempMovie) {
-        Log.i("MA_onItemSelected", tempMovie.toString());
         if (mTwoPane) {
             Bundle args = new Bundle();
             args.putParcelable(MovieActivityFragment.MOVIE_FRAGMENT, tempMovie);

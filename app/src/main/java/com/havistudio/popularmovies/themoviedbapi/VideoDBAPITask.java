@@ -90,7 +90,9 @@ public class VideoDBAPITask extends AsyncTask<String, Void, List<Video>> {
         super.onPostExecute(videos);
         if (videos != null) {
             if (videos.size() == 0) {
-                mVideoAdapter.removeAll();
+                if(mVideoAdapter != null) {
+                    mVideoAdapter.removeAll();
+                }
                 Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
             } else {
                 mVideoAdapter = new VideoAdapter(mContext, videos, R.layout.listview_trailer_buttons);

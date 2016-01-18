@@ -1,11 +1,14 @@
 package com.havistudio.popularmovies.themoviedbapi;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.havistudio.popularmovies.BuildConfig;
 import com.havistudio.popularmovies.MainActivityMyAdapter;
+import com.havistudio.popularmovies.db.Contract;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,25 +53,48 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
         if (params.length == 0) {
             return null;
         }
+        if(params[0].equals("favorites")){
+            Log.i("cursor", Contract.FavoritiesEntry.CONTENT_URI.toString());
+            Cursor favoriteCursor = mContext.getContentResolver().query(
+                    Contract.FavoritiesEntry.CONTENT_URI,
+                    new String[]{
+                            Contract.FavoritiesEntry._ID,
+                            Contract.FavoritiesEntry.COLUMN_SELECTED,
+                            Contract.FavoritiesEntry.COLUMN_MOVIEDB_ID,
+                            Contract.FavoritiesEntry.COLUMN_IMAGE,
+                            Contract.FavoritiesEntry.COLUMN_OVERVIEW,
+                            Contract.FavoritiesEntry.COLUMN_TITLE,
+                            Contract.FavoritiesEntry.COLUMN_AVERAGE_RATING,
+                            Contract.FavoritiesEntry.COLUMN_RELEASE_DATE
+                    },
+                    Contract.FavoritiesEntry.COLUMN_SELECTED + " = ?",
+                    new String[]{"1"},
+                    null);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.themoviedb.org/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        MyApiRetrofit service = retrofit.create(MyApiRetrofit.class);
+            while (favoriteCursor.moveToNext()) {
+                result.add(new Movie(favoriteCursor.getLong(2), favoriteCursor.getString(5), favoriteCursor.getString(3)
+                        , favoriteCursor.getString(4), favoriteCursor.getString(6), favoriteCursor.getString(7)));
+            }
 
-        Map<String,String> temp = new HashMap<String,String>();
-        temp.put("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY);
-        temp.put("sort_by", params[0]);
+        }else {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://api.themoviedb.org/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            MyApiRetrofit service = retrofit.create(MyApiRetrofit.class);
 
-        Call<MovieJson> call = service.getMovies(temp);
-        try {
-            Response<MovieJson> tempo = call.execute();
-            result = tempo.body().getmMovies();
-        } catch (IOException e) {
-            e.printStackTrace();
+            Map<String, String> temp = new HashMap<String, String>();
+            temp.put("api_key", BuildConfig.MOVIE_DB_ORG_API_KEY);
+            temp.put("sort_by", params[0]);
+
+            Call<MovieJson> call = service.getMovies(temp);
+            try {
+                Response<MovieJson> tempo = call.execute();
+                result = tempo.body().getmMovies();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
         return result;
     }
 
@@ -78,7 +104,9 @@ public class MovieDBAPITask extends AsyncTask<String, Void, List<Movie>> {
 
         if (movies != null) {
             if (movies.size() == 0) {
-                mMovieAdapter.removeAll();
+                if(mMovieAdapter != null) {
+                    mMovieAdapter.removeAll();
+                }
                 Toast.makeText(mContext, "No artist found with this name", Toast.LENGTH_LONG).show();
             } else {
                 if(mMovieAdapter != null){

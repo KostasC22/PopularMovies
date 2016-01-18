@@ -83,7 +83,6 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
     private String movieId;
 
     public MovieActivityFragment() {
-        Log.i("MovieActivityFragment",mMovie+"");
     }
 
     @Override
@@ -95,6 +94,7 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         if (arguments != null) {
             mMovie = arguments.getParcelable(MovieActivityFragment.MOVIE_FRAGMENT);
         }
+        Log.i("MovieActivityFragment",mMovie+"");
         // get the context
         mContext = getActivity();
         // Get the intent information
@@ -180,7 +180,7 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
     @OnClick(R.id.is_favorite)
     public void makeFavorite() {
         buttonFavorite.setEnabled(false);
-        MakeFavoriteAsyncTask mfat = new MakeFavoriteAsyncTask(getActivity(), mMovie.getId()+"", buttonFavorite, tempSelectedFavorite);
+        MakeFavoriteAsyncTask mfat = new MakeFavoriteAsyncTask(getActivity(), mMovie, buttonFavorite, tempSelectedFavorite);
         mfat.execute();
     }
 

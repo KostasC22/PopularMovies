@@ -39,6 +39,11 @@ public class Contract {
         public static final String TABLE_NAME = "favorities";
         public static final String COLUMN_SELECTED = "selected";
         public static final String COLUMN_MOVIEDB_ID = "moviedb_id";
+        public static final String COLUMN_IMAGE = "image";
+        public static final String COLUMN_OVERVIEW = "overview";
+        public static final String COLUMN_TITLE = "title";
+        public static final String COLUMN_AVERAGE_RATING = "average_rating";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
 
         public static Uri buildFavoritiesUri(long id) {
             return CONTENT_URI.buildUpon().appendPath("" + id).build();
