@@ -1,6 +1,7 @@
 package com.havistudio.popularmovies;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -54,8 +55,16 @@ public class VideoAdapter extends BaseAdapter {
         holder.trailer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + video.getKey()));
-                context.startActivity(intent);
+                try{
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + video.getKey()));
+                    context.startActivity(intent);
+                }catch (ActivityNotFoundException ex){
+                    ex.printStackTrace();
+                    Intent intent=new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://www.youtube.com/watch?v="+video.getKey()));
+                    context.startActivity(intent);
+                }
+
             }
         });
 
