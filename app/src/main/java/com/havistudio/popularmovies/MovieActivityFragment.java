@@ -94,11 +94,20 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         if (arguments != null) {
             mMovie = arguments.getParcelable(MovieActivityFragment.MOVIE_FRAGMENT);
         }
+        // Get the intent information
+        Intent intent = getActivity().getIntent();
+        Movie tempo = intent.getExtras().getParcelable("movie");
+        if(mMovie == null){
+            if(tempo != null){
+                mMovie = tempo;
+            }
+        }
+
         Log.i("MovieActivityFragment",mMovie+"");
         // get the context
         mContext = getActivity();
-        // Get the intent information
-        Intent intent = getActivity().getIntent();
+
+
         movieId = 0+"";
         String tempMovieImage = "";
         String tempMovieOverview = "";
