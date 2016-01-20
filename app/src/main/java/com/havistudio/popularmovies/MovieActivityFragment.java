@@ -96,7 +96,13 @@ public class MovieActivityFragment extends Fragment implements LoaderManager.Loa
         }
         // Get the intent information
         Intent intent = getActivity().getIntent();
-        Movie tempo = intent.getExtras().getParcelable("movie");
+        Movie tempo = null;
+        try {
+            tempo = intent.getExtras().getParcelable("movie");
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
         if(mMovie == null){
             if(tempo != null){
                 mMovie = tempo;
